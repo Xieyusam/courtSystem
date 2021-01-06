@@ -1,11 +1,13 @@
 <template>
   <div id="mainpage">
     <el-container>
-      <el-header>Header</el-header>
+      <el-header>
+        <headerbox></headerbox>
+      </el-header>
       <el-container class="containerbox">
-        <el-aside width="160px">
+        <!-- <el-aside width="160px">
             <menubox></menubox>
-        </el-aside>
+        </el-aside> -->
         <el-container>
           <el-main>
               <router-view/>
@@ -17,11 +19,11 @@
 </template>
 
 <script>
-import menubox from '@/components/menubox'
+import headerbox from '@/components/headerbox'
 export default {
   name: "mainpage",
   components:{
-    menubox
+    headerbox
   },
   data() {
     return {};
@@ -36,10 +38,11 @@ export default {
   width: 100vw;
 }
 .el-header {
-  background-color: #b3c0d1;
-  color: #333;
-  text-align: center;
+  /* background-color: #b3c0d1; */
+  /* color: #333; */
+  /* text-align: center; */
   height: 60px;
+  padding: 0;
 }
 
 .el-aside {
@@ -51,7 +54,7 @@ export default {
 }
 
 .el-main {
-  background-color: #e9eef3;
+  /* background-color: #e9eef3; */
   color: #333;
   text-align: center;
   height: 100%;
