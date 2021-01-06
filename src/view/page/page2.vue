@@ -1,39 +1,44 @@
 <template>
   <div class="court-list">
-    <!-- <div class="page-header">资源管理</div>
-    <el-divider></el-divider> -->
+    <div class="page-header">资源管理</div>
     <div class="search-line">
-    <div style="width: 200px">
-      <el-input
-        placeholder="名称或备注"
-        prefix-icon="el-icon-search"
-        v-model="input2"
-        size="small"
-      >
-      </el-input>
-    </div>
-    <div style="width: 100px">
-      <el-select v-model="value1" size="small" placeholder="类型">
-        <el-option
-          v-for="item in options1"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
+      <div style="width: 200px; margin-right: 20px">
+        <el-input
+          placeholder="名称或备注"
+          prefix-icon="el-icon-search"
+          v-model="input2"
+          size="medium"
         >
-        </el-option>
-      </el-select>
-    </div>
-    <div style="width: 100px">
-      <el-select v-model="value" size="small" placeholder="状态">
-        <el-option
-          v-for="item in options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
+        </el-input>
+      </div>
+      <div style="width: 100px; margin-right: 20px">
+        <el-select v-model="value1" size="medium" placeholder="类型">
+          <el-option
+            v-for="item in options1"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          >
+          </el-option>
+        </el-select>
+      </div>
+      <div style="width: 100px; margin-right: 20px">
+        <el-select v-model="value" size="medium" placeholder="状态">
+          <el-option
+            v-for="item in options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          >
+          </el-option>
+        </el-select>
+      </div>
+      <div style="margin-right: 20px">
+        <el-button size="medium" type="primary">查找</el-button>
+        <el-button @click="dialogVisible = true" size="medium" type="primary"
+          >创建球场</el-button
         >
-        </el-option>
-      </el-select>
-    </div>
+      </div>
     </div>
     <el-table :data="tableData" border style="width: 100%">
       <el-table-column prop="name" label="名称" width="180" align="center">
@@ -58,6 +63,51 @@
         </template>
       </el-table-column>
     </el-table>
+    <!-- 创建球场 -->
+    <el-dialog
+      title="创建球场"
+      :visible.sync="dialogVisible"
+      width="300px"
+      :before-close="handleClose"
+    >
+      <div>
+
+            <el-input
+              placeholder="球场名称"
+              v-model="input2"
+              size="medium"
+              style="width:100%;margin-bottom:20px;"
+            >
+            </el-input>
+
+
+            <el-select v-model="value1" size="medium" style="width:100%;margin-bottom:20px;" placeholder="类型">
+              <el-option
+                v-for="item in options1"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
+
+            <el-input
+              placeholder="备注"
+              v-model="input2"
+              size="medium"
+              style="width:100%;margin-bottom:20px;"
+            >
+            </el-input>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button size="medium" @click="dialogVisible = false"
+          >取 消</el-button
+        >
+        <el-button size="medium" type="primary" @click="dialogVisible = false"
+          >确 定</el-button
+        >
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -65,6 +115,7 @@
 export default {
   data() {
     return {
+      dialogVisible: false,
       tableData: [
         {
           name: "羽毛球场1",
@@ -179,11 +230,22 @@ export default {
 }
 .page-header {
   text-align: start;
+  /* float: left; */
+  /* position: relative; */
+  background: #606266;
+  color: #ffffff;
+  padding: 5px 20px;
+  border-bottom-right-radius: 50em;
+  border-top-right-radius: 50em;
+  /* left: 0; */
+  float: left;
+  margin-left: -20px;
 }
-.search-line{
+.search-line {
+  /* width: 100%; */
   display: flex;
   flex-direction: row;
-  justify-content:flex-end;
+  justify-content: flex-end;
   margin-bottom: 20px;
 }
 </style>

@@ -1,19 +1,18 @@
 <template>
   <div class="court-list">
-    <!-- <div class="page-header">资源管理</div>
-    <el-divider></el-divider> -->
+    <div class="page-header">预订管理</div>
     <div class="search-line">
-      <div style="width: 200px">
+      <div style="width: 200px; margin-right: 20px">
         <el-input
           placeholder="名称或备注"
           prefix-icon="el-icon-search"
           v-model="input2"
-          size="small"
+          size="medium"
         >
         </el-input>
       </div>
       <div style="width: 100px">
-        <el-select v-model="value1" size="small" placeholder="类型">
+        <el-select v-model="value1" size="medium" placeholder="类型">
           <el-option
             v-for="item in options1"
             :key="item.value"
@@ -24,7 +23,7 @@
         </el-select>
       </div>
       <!-- <div style="width: 200px">
-      <el-select v-model="value" size="small" placeholder="状态">
+      <el-select v-model="value" size="medium" placeholder="状态">
         <el-option
           v-for="item in options"
           :key="item.value"
@@ -36,20 +35,30 @@
     </div> -->
     </div>
     <el-table :data="tableData" border style="width: 100%">
-      <el-table-column prop="name" label="名称" width="180" align="center">
+      <el-table-column prop="name" label="名称" align="center">
       </el-table-column>
-      <el-table-column prop="type" label="类型" width="180" align="center">
+      <el-table-column prop="type" label="类型" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.type | CourtTypeChange }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="status" label="状态" width="180" align="center">
+      <el-table-column prop="status" label="状态" align="center">
       </el-table-column>
-      <el-table-column prop="tips" label="备注" align="center">
+      <!-- <el-table-column prop="tips" label="备注" align="center">
+      </el-table-column> -->
+      <el-table-column prop="empty1" label="今天空余量" align="center">
+      </el-table-column>
+      <el-table-column prop="empty2" label="明天空余量" align="center">
+      </el-table-column>
+      <el-table-column prop="empty3" label="后天空余量" align="center">
       </el-table-column>
       <el-table-column label="操作" width="180" align="center">
         <template slot-scope="scope">
-          <el-button size="mini" @click="handleShow(scope.$index, scope.row)">
+          <el-button
+            size="mini"
+            type="primary"
+            @click="handleShow(scope.$index, scope.row)"
+          >
             查看预订
           </el-button>
         </template>
@@ -220,11 +229,22 @@ export default {
 }
 .page-header {
   text-align: start;
+  /* float: left; */
+  /* position: relative; */
+  background: #606266;
+  color: #ffffff;
+  padding: 5px 20px;
+  border-bottom-right-radius:50em;
+  border-top-right-radius:50em;
+  /* left: 0; */
+  float: left;
+  margin-left:-20px ;
 }
-.search-line {
+.search-line{
+  /* width: 100%; */
   display: flex;
   flex-direction: row;
-  justify-content: flex-end;
+  justify-content:flex-end;
   margin-bottom: 20px;
 }
 .linebox {
@@ -244,7 +264,7 @@ export default {
 .box-gray:hover {
   background: #d8d8d8;
 }
-.box-black{
+.box-black {
   background: #3d3d3da4;
   color: #ffffff;
 }

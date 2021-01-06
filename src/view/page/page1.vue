@@ -68,6 +68,14 @@ export default {
   border-radius: 16px;
   cursor: pointer;
 }
+.big-box:hover{
+   /* box-shadow: 0 2px 4px rgba(0, 0, 0, .22), 0 0 6px rgba(0, 0, 0, .24); */
+   box-shadow: 0 6px 6px rgba(0, 0, 0, .22), 0 0 10px rgba(0, 0, 0, .24);
+   /* margin-top: -100px;
+   transform: translateX(0.5s); */
+   color: #eeeeee;
+   
+}
 .box-icon {
   width: 100%;
   text-align: center;

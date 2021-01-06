@@ -1,19 +1,18 @@
 <template>
   <div class="court-list">
-    <!-- <div class="page-header">资源管理</div>
-    <el-divider></el-divider> -->
+    <div class="page-header">用户管理</div>
     <div class="search-line">
-      <div style="width: 200px">
+      <div style="width: 200px; margin-right: 20px">
         <el-input
           placeholder="名称或备注"
           prefix-icon="el-icon-search"
           v-model="input2"
-          size="small"
+          size="medium"
         >
         </el-input>
       </div>
       <div style="width: 100px">
-        <el-select v-model="value1" size="small" placeholder="类型">
+        <el-select v-model="value1" size="medium" placeholder="类型">
           <el-option
             v-for="item in options1"
             :key="item.value"
@@ -24,7 +23,7 @@
         </el-select>
       </div>
       <!-- <div style="width: 200px">
-      <el-select v-model="value" size="small" placeholder="状态">
+      <el-select v-model="value" size="medium" placeholder="状态">
         <el-option
           v-for="item in options"
           :key="item.value"
@@ -226,8 +225,7 @@ export default {
       value2: "1",
     };
   },
-  methods: {
-  },
+  methods: {},
 };
 </script>
 
@@ -237,11 +235,22 @@ export default {
 }
 .page-header {
   text-align: start;
+  /* float: left; */
+  /* position: relative; */
+  background: #606266;
+  color: #ffffff;
+  padding: 5px 20px;
+  border-bottom-right-radius:50em;
+  border-top-right-radius:50em;
+  /* left: 0; */
+  float: left;
+  margin-left:-20px ;
 }
-.search-line {
+.search-line{
+  /* width: 100%; */
   display: flex;
   flex-direction: row;
-  justify-content: flex-end;
+  justify-content:flex-end;
   margin-bottom: 20px;
 }
 .linebox {

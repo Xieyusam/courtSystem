@@ -2,23 +2,28 @@
   <div id="login">
     <div class="login-box">
       <div class="title">球场管理系统</div>
-      <div class="child-box"  v-if="!isRegister">
+      <div class="child-box" v-if="!isRegister">
         <el-input placeholder="your phone" v-model="phone"> </el-input>
-        <el-input placeholder="your password" show-password v-model="password"> </el-input>
-
-        <el-button @click="isRegister = !isRegister" type="primary"
-          >register</el-button
-        >
-        <el-button type="primary" @click="doLogin">login</el-button>
+        <el-input placeholder="your password" show-password v-model="password">
+        </el-input>
+        <div class="btn-line">
+          <el-button @click="isRegister = !isRegister" type="primary"
+            >register</el-button
+          >
+          <el-button type="primary" @click="doLogin">login</el-button>
+        </div>
       </div>
       <div class="child-box" v-if="isRegister">
         <el-input placeholder="your username" v-model="username"> </el-input>
         <el-input placeholder="your phone" v-model="phone"> </el-input>
-        <el-input placeholder="your password" show-password v-model="password"> </el-input>
-        <el-button @click="isRegister = !isRegister" type="primary"
-          >return</el-button
-        >
-        <el-button type="primary">comfirm</el-button>
+        <el-input placeholder="your password" show-password v-model="password">
+        </el-input>
+        <div class="btn-line">
+          <el-button @click="isRegister = !isRegister" type="primary"
+            >return</el-button
+          >
+          <el-button type="primary">comfirm</el-button>
+        </div>
       </div>
     </div>
     <div class="login-image"></div>
@@ -26,25 +31,23 @@
 </template>
 
 <script>
-import {
-  cookieData
-} from "@/util/local";
+import { cookieData } from "@/util/local";
 export default {
   name: "login",
   data() {
     return {
       username: "",
       password: "",
-      phone:"",
+      phone: "",
       isRegister: false,
     };
   },
-  methods:{
-    doLogin(){
-      cookieData('set','token','123')
-      this.$router.push({path:'/page1'})
-    }
-  }
+  methods: {
+    doLogin() {
+      cookieData("set", "token", "123");
+      this.$router.push({ path: "/page1" });
+    },
+  },
 };
 </script>
 
@@ -79,11 +82,17 @@ export default {
   width: 80%;
   margin: auto;
 }
-#login .login-box .child-box > .el-input {
+#login .login-box .child-box  > .el-input {
   margin: 14px 0;
 }
-#login .login-box .child-box > .el-button {
+#login .login-box .child-box .btn-line  > .el-button {
   margin: 14px 0;
   width: 48%;
+}
+#login .login-box .child-box .btn-line{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 </style>

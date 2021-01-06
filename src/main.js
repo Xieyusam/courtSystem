@@ -7,10 +7,11 @@ import axios from "./util/axios"
 import {
   cookieData
 } from "@/util/local";
+import '@/style/iconfont/iconfont.css';
+
 
 
 Vue.config.productionTip = false
-
 import ElementUI from 'element-ui';
 // import 'element-ui/lib/theme-chalk/index.css';
 import '@/style/theme/index.css';
