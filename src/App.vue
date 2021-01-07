@@ -35,4 +35,12 @@ export default {
 ::-webkit-scrollbar-thumb:hover {
   background-color: #bbb;
 }
+.el-dialog__header{
+  background-color: #606266;
+  color: #ffffff !important;
+}
+.el-dialog__header .el-dialog__title{
+  color: #ffffff !important;
+}
+
 </style>
