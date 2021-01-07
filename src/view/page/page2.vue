@@ -2,16 +2,7 @@
   <div class="court-list">
     <div class="page-header">资源管理</div>
     <div class="search-line">
-      <div style="width: 200px; margin-right: 20px">
-        <el-input
-          placeholder="名称或备注"
-          prefix-icon="el-icon-search"
-          v-model="input2"
-          size="medium"
-        >
-        </el-input>
-      </div>
-      <div style="width: 100px; margin-right: 20px">
+      <div style="width: 100px; margin-right: 14px">
         <el-select v-model="value1" size="medium" placeholder="类型">
           <el-option
             v-for="item in options1"
@@ -22,7 +13,7 @@
           </el-option>
         </el-select>
       </div>
-      <div style="width: 100px; margin-right: 20px">
+      <div style="width: 100px; margin-right: 14px;">
         <el-select v-model="value" size="medium" placeholder="状态">
           <el-option
             v-for="item in options"
@@ -33,26 +24,65 @@
           </el-option>
         </el-select>
       </div>
-      <div style="margin-right: 20px">
-        <el-button size="medium" type="primary">查找</el-button>
+      <div style="width: 200px;">
+        <el-input
+          placeholder="名称或备注"
+          prefix-icon="el-icon-search"
+          v-model="input2"
+          size="medium"
+        >
+        </el-input>
+      </div>
+      <div>
+        <el-button size="medium" icon="el-icon-search"></el-button>
         <el-button @click="dialogVisible = true" size="medium" type="primary"
           >创建球场</el-button
         >
       </div>
     </div>
-    <el-table :data="tableData" border style="width: 100%">
+    <el-table
+      :data="tableData"
+      border
+      style="width: 100%"
+      :header-cell-style="{ background: '#eeeeee' }"
+    >
       <el-table-column prop="name" label="名称" width="180" align="center">
+        <template slot-scope="scope">
+          <span style="font-weight: bold">{{ scope.row.name }}</span>
+        </template>
       </el-table-column>
       <el-table-column prop="type" label="类型" width="180" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.type | CourtTypeChange }}</span>
+        </template>
       </el-table-column>
       <el-table-column prop="status" label="状态" width="180" align="center">
+        <template slot-scope="scope">
+          <span
+            :style="{ color: scope.row.status == 1 ? '#67C23A' : '#F56C6C' }"
+            >{{ scope.row.status == 1 ? "正常" : "停用" }}</span
+          >
+        </template>
       </el-table-column>
       <el-table-column prop="tips" label="备注" align="center">
       </el-table-column>
       <el-table-column label="操作" width="180" align="center">
         <template slot-scope="scope">
-          <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">
+          <el-button
+            type="success"
+            v-if="scope.row.status == 0"
+            size="mini"
+            @click="handleOpen(scope.$index, scope.row)"
+          >
             恢复
+          </el-button>
+          <el-button
+            type="warning"
+            v-if="scope.row.status == 1"
+            size="mini"
+            @click="handleStop(scope.$index, scope.row)"
+          >
+            停用
           </el-button>
           <el-button
             size="mini"
@@ -71,39 +101,40 @@
       :before-close="handleClose"
     >
       <div>
+        <el-input
+          placeholder="球场名称"
+          v-model="input2"
+          size="medium"
+          style="width: 100%; margin-bottom: 20px"
+        >
+        </el-input>
 
-            <el-input
-              placeholder="球场名称"
-              v-model="input2"
-              size="medium"
-              style="width:100%;margin-bottom:20px;"
-            >
-            </el-input>
+        <el-select
+          v-model="value1"
+          size="medium"
+          style="width: 100%; margin-bottom: 20px"
+          placeholder="类型"
+        >
+          <el-option
+            v-for="item in options1"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          >
+          </el-option>
+        </el-select>
 
-
-            <el-select v-model="value1" size="medium" style="width:100%;margin-bottom:20px;" placeholder="类型">
-              <el-option
-                v-for="item in options1"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              >
-              </el-option>
-            </el-select>
-
-            <el-input
-              placeholder="备注"
-              v-model="input2"
-              size="medium"
-              style="width:100%;margin-bottom:20px;"
-            >
-            </el-input>
+        <el-input
+          placeholder="备注"
+          v-model="input2"
+          size="medium"
+          style="width: 100%; margin-bottom: 20px"
+        >
+        </el-input>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button size="medium" @click="dialogVisible = false"
-          >取 消</el-button
-        >
-        <el-button size="medium" type="primary" @click="dialogVisible = false"
+        <el-button size="mini" @click="dialogVisible = false">取 消</el-button>
+        <el-button size="mini" type="primary" @click="dialogVisible = false"
           >确 定</el-button
         >
       </span>
@@ -112,6 +143,7 @@
 </template>
 
 <script>
+import { courtType } from "@/util/common";
 export default {
   data() {
     return {
@@ -119,68 +151,116 @@ export default {
       tableData: [
         {
           name: "羽毛球场1",
-          type: "羽毛球",
-          status: "正常",
+          type: 1,
+          status: 1,
           tips: "上海市普陀区金沙江路 1518 弄",
         },
         {
           name: "羽毛球场1",
-          type: "羽毛球",
-          status: "正常",
+          type: 1,
+          status: 1,
           tips: "上海市普陀区金沙江路 1518 弄",
         },
         {
           name: "羽毛球场1",
-          type: "羽毛球",
-          status: "正常",
+          type: 1,
+          status: 1,
           tips: "上海市普陀区金沙江路 1518 弄",
         },
         {
           name: "羽毛球场1",
-          type: "羽毛球",
-          status: "正常",
+          type: 1,
+          status: 1,
           tips: "上海市普陀区金沙江路 1518 弄",
         },
         {
-          name: "羽毛球场1",
-          type: "羽毛球",
-          status: "正常",
+          name: "篮球场1",
+          type: 2,
+          status: 1,
           tips: "上海市普陀区金沙江路 1518 弄",
         },
         {
-          name: "羽毛球场1",
-          type: "羽毛球",
-          status: "正常",
+          name: "篮球场1",
+          type: 2,
+          status: 1,
           tips: "上海市普陀区金沙江路 1518 弄",
         },
         {
-          name: "羽毛球场1",
-          type: "羽毛球",
-          status: "正常",
+          name: "篮球场1",
+          type: 2,
+          status: 1,
           tips: "上海市普陀区金沙江路 1518 弄",
         },
         {
-          name: "羽毛球场1",
-          type: "羽毛球",
-          status: "正常",
+          name: "篮球场1",
+          type: 2,
+          status: 1,
           tips: "上海市普陀区金沙江路 1518 弄",
         },
         {
-          name: "羽毛球场1",
-          type: "羽毛球",
-          status: "正常",
+          name: "篮球场1",
+          type: 2,
+          status: 1,
           tips: "上海市普陀区金沙江路 1518 弄",
         },
         {
-          name: "羽毛球场1",
-          type: "羽毛球",
-          status: "正常",
+          name: "篮球场1",
+          type: 2,
+          status: 1,
           tips: "上海市普陀区金沙江路 1518 弄",
         },
         {
-          name: "羽毛球场1",
-          type: "羽毛球",
-          status: "正常",
+          name: "篮球场1",
+          type: 2,
+          status: 1,
+          tips: "上海市普陀区金沙江路 1518 弄",
+        },
+        {
+          name: "篮球场1",
+          type: 2,
+          status: 1,
+          tips: "上海市普陀区金沙江路 1518 弄",
+        },
+        {
+          name: "篮球场1",
+          type: 2,
+          status: 1,
+          tips: "上海市普陀区金沙江路 1518 弄",
+        },
+        {
+          name: "篮球场1",
+          type: 2,
+          status: 1,
+          tips: "上海市普陀区金沙江路 1518 弄",
+        },
+        {
+          name: "篮球场1",
+          type: 2,
+          status: 0,
+          tips: "上海市普陀区金沙江路 1518 弄",
+        },
+        {
+          name: "篮球场1",
+          type: 2,
+          status: 0,
+          tips: "上海市普陀区金沙江路 1518 弄",
+        },
+        {
+          name: "篮球场1",
+          type: 2,
+          status: 0,
+          tips: "上海市普陀区金沙江路 1518 弄",
+        },
+        {
+          name: "篮球场1",
+          type: 2,
+          status: 0,
+          tips: "上海市普陀区金沙江路 1518 弄",
+        },
+        {
+          name: "篮球场1",
+          type: 2,
+          status: 0,
           tips: "上海市普陀区金沙江路 1518 弄",
         },
       ],
@@ -220,7 +300,25 @@ export default {
       value2: "1",
     };
   },
-  methods: {},
+  filters: {
+    CourtTypeChange(value) {
+      return courtType(value);
+    },
+  },
+  methods: {
+    // 删除
+    handleDelete(index, row) {
+      alert("删除" + index);
+    },
+    // 恢复
+    handleOpen(index, row) {
+      alert("恢复" + index);
+    },
+    // 停用
+    handleStop(index, row) {
+      alert("停用" + index);
+    },
+  },
 };
 </script>
 

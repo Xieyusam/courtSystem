@@ -15,6 +15,7 @@ export function orderTimeType(value){
 }
 
 export function courtType(value){
+    value = parseInt(value)
     const type = [
         "",
         "羽毛球",
@@ -25,4 +26,32 @@ export function courtType(value){
         "排球"
     ]
     return type[value]
+}
+
+export function returnThreeDay(){
+    let ThreeDay = [] 
+    let dayValue = new Date()
+    // 今天
+    dayValue.setTime(dayValue.getTime());
+    const today = {
+        str:dayValue.getFullYear()+"-" + (dayValue.getMonth()+1) + "-" + dayValue.getDate(),
+        gettime:dayValue.getTime()
+    }
+    ThreeDay.push(today)
+    // 明天
+    dayValue.setTime(dayValue.getTime()+24*60*60*1000);
+    const tomorrow = {
+        str:dayValue.getFullYear()+"-" + (dayValue.getMonth()+1) + "-" + dayValue.getDate(),
+        gettime:dayValue.getTime()
+    }
+    ThreeDay.push(tomorrow)
+    // 后天
+    dayValue.setTime(dayValue.getTime()+24*60*60*1000);
+    const lastday = {
+        str:dayValue.getFullYear()+"-" + (dayValue.getMonth()+1) + "-" + dayValue.getDate(),
+        gettime:dayValue.getTime()
+    }
+    ThreeDay.push(lastday)
+    
+    return ThreeDay
 }

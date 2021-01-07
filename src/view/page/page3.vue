@@ -2,16 +2,7 @@
   <div class="court-list">
     <div class="page-header">预订管理</div>
     <div class="search-line">
-      <div style="width: 200px; margin-right: 20px">
-        <el-input
-          placeholder="名称或备注"
-          prefix-icon="el-icon-search"
-          v-model="input2"
-          size="medium"
-        >
-        </el-input>
-      </div>
-      <div style="width: 100px">
+      <div style="width: 100px; margin-right: 14px">
         <el-select v-model="value1" size="medium" placeholder="类型">
           <el-option
             v-for="item in options1"
@@ -22,20 +13,40 @@
           </el-option>
         </el-select>
       </div>
-      <!-- <div style="width: 200px">
-      <el-select v-model="value" size="medium" placeholder="状态">
-        <el-option
-          v-for="item in options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
+      <div style="width: 100px; margin-right: 14px">
+        <el-select v-model="value1" size="medium" placeholder="状态">
+          <el-option
+            v-for="item in options1"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          >
+          </el-option>
+        </el-select>
+      </div>
+      <div style="width: 200px">
+        <el-input
+          placeholder="名称或备注"
+          prefix-icon="el-icon-search"
+          v-model="input2"
+          size="medium"
         >
-        </el-option>
-      </el-select>
-    </div> -->
+        </el-input>
+      </div>
+      <div>
+        <el-button size="medium" icon="el-icon-search"></el-button>
+      </div>
     </div>
-    <el-table :data="tableData" border style="width: 100%">
+    <el-table
+      :data="tableData"
+      border
+      style="width: 100%"
+      :header-cell-style="{ background: '#eeeeee' }"
+    >
       <el-table-column prop="name" label="名称" align="center">
+        <template slot-scope="scope">
+          <span style="font-weight: bold">{{ scope.row.name }}</span>
+        </template>
       </el-table-column>
       <el-table-column prop="type" label="类型" align="center">
         <template slot-scope="scope">
@@ -43,9 +54,13 @@
         </template>
       </el-table-column>
       <el-table-column prop="status" label="状态" align="center">
+        <template slot-scope="scope">
+          <span
+            :style="{ color: scope.row.status == 1 ? '#67C23A' : '#F56C6C' }"
+            >{{ scope.row.status == 1 ? "正常" : "停用" }}</span
+          >
+        </template>
       </el-table-column>
-      <!-- <el-table-column prop="tips" label="备注" align="center">
-      </el-table-column> -->
       <el-table-column prop="empty1" label="今天空余量" align="center">
       </el-table-column>
       <el-table-column prop="empty2" label="明天空余量" align="center">
@@ -72,9 +87,9 @@
     >
       <div>
         <el-tabs v-model="activeName" @tab-click="handleClick">
-          <el-tab-pane label="今天" name="1"></el-tab-pane>
-          <el-tab-pane label="明天" name="2"></el-tab-pane>
-          <el-tab-pane label="后天" name="3"></el-tab-pane>
+          <el-tab-pane :label="'今天'+dayArry[0].str" name="1"></el-tab-pane>
+          <el-tab-pane :label="'明天'+dayArry[1].str" name="2"></el-tab-pane>
+          <el-tab-pane :label="'后天'+dayArry[2].str" name="3"></el-tab-pane>
         </el-tabs>
         <div class="time-box">
           <div class="linebox box-black">上午场</div>
@@ -91,86 +106,83 @@
           <div class="linebox box-gray">11：00 - 12：00</div>
         </div>
       </div>
-      <!-- <span slot="footer" class="dialog-footer">
-    <el-button @click="dialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="dialogVisible = false">关闭</el-button>
-  </span> -->
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { courtType } from "@/util/common";
+import { courtType,returnThreeDay } from "@/util/common";
 export default {
   data() {
     return {
+      dayArry:[],
       activeName: "1",
       dialogVisible: false,
       tableData: [
         {
           name: "羽毛球场1",
           type: "1",
-          status: "正常",
+          status: 1,
           tips: "上海市普陀区金沙江路 1518 弄",
         },
         {
           name: "羽毛球场1",
           type: "1",
-          status: "正常",
+          status: 1,
           tips: "上海市普陀区金沙江路 1518 弄",
         },
         {
           name: "羽毛球场1",
           type: "1",
-          status: "正常",
+          status: 1,
           tips: "上海市普陀区金沙江路 1518 弄",
         },
         {
           name: "羽毛球场1",
           type: "1",
-          status: "正常",
+          status: 1,
           tips: "上海市普陀区金沙江路 1518 弄",
         },
         {
           name: "羽毛球场1",
           type: "1",
-          status: "正常",
+          status: 1,
           tips: "上海市普陀区金沙江路 1518 弄",
         },
         {
           name: "羽毛球场1",
           type: "1",
-          status: "正常",
+          status: 1,
           tips: "上海市普陀区金沙江路 1518 弄",
         },
         {
           name: "羽毛球场1",
           type: "1",
-          status: "正常",
+          status: 1,
           tips: "上海市普陀区金沙江路 1518 弄",
         },
         {
           name: "羽毛球场1",
           type: "1",
-          status: "正常",
+          status: 1,
           tips: "上海市普陀区金沙江路 1518 弄",
         },
         {
           name: "羽毛球场1",
           type: "1",
-          status: "正常",
+          status: 1,
           tips: "上海市普陀区金沙江路 1518 弄",
         },
         {
           name: "羽毛球场1",
           type: "1",
-          status: "正常",
+          status: 1,
           tips: "上海市普陀区金沙江路 1518 弄",
         },
         {
           name: "羽毛球场1",
           type: "1",
-          status: "正常",
+          status: 1,
           tips: "上海市普陀区金沙江路 1518 弄",
         },
       ],
@@ -215,10 +227,17 @@ export default {
       return courtType(value);
     },
   },
+  mounted(){
+    this.getThreeDay()
+  },
   methods: {
     handleShow() {
       this.dialogVisible = true;
     },
+    getThreeDay(){
+      // console.log(returnThreeDay()) 
+      this.dayArry = returnThreeDay()
+    }
   },
 };
 </script>
@@ -234,17 +253,17 @@ export default {
   background: #606266;
   color: #ffffff;
   padding: 5px 20px;
-  border-bottom-right-radius:50em;
-  border-top-right-radius:50em;
+  border-bottom-right-radius: 50em;
+  border-top-right-radius: 50em;
   /* left: 0; */
   float: left;
-  margin-left:-20px ;
+  margin-left: -20px;
 }
-.search-line{
+.search-line {
   /* width: 100%; */
   display: flex;
   flex-direction: row;
-  justify-content:flex-end;
+  justify-content: flex-end;
   margin-bottom: 20px;
 }
 .linebox {
