@@ -45,7 +45,7 @@ export default {
   methods: {
     doLogin() {
       cookieData("set", "token", "123");
-      this.$router.push({ path: "/page1" });
+      this.$router.push({ path: "/" });
     },
   },
 };

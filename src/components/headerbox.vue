@@ -26,6 +26,7 @@
       title="我的信息"
       :visible.sync="dialogVisible"
       width="400px"
+      center
     >
       <div>
         <ul>
