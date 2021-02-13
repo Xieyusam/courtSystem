@@ -4,15 +4,73 @@ export function orderTimeType(value){
         "9:00 - 10:00",
         "10:00 - 11:00",
         "11:00 - 12:00",
-        "3:00 - 4:00",
-        "4:00 - 5:00",
-        "5:00 - 6:00",
-        "7:00 - 8:00",
-        "8:00 - 9:00",
-        "9:00 - 10:00"
+        "15:00 - 16:00",
+        "16:00 - 17:00",
+        "17:00 - 18:00",
+        "19:00 - 20:00",
+        "20:00 - 21:00",
+        "21:00 - 22:00"
     ]
     return type[value]
 }
+
+export function getTimeType(){
+    const type = [
+        {
+            value:"",
+            label:"全部"
+        },{
+            value:"0",
+            label:"9:00 - 10:00"
+        },{
+            value:"1",
+            label:"10:00 - 11:00"
+        },{
+            value:"2",
+            label:"11:00 - 12:00"
+        },{
+            value:"3",
+            label: "15:00 - 16:00"
+        },{
+            value:"4",
+            label:"16:00 - 17:00"
+        },{
+            value:"5",
+            label:"17:00 - 18:00"
+        },{
+            value:"6",
+            label:"19:00 - 20:00"
+        },{
+            value:"7",
+            label:"20:00 - 21:00"
+        },{
+            value:"8",
+            label:"21:00 - 22:00"
+        }
+    ]
+    return type
+}
+
+// 时间格式转换
+export function dateFormat(fmt, date) {
+    let ret;
+    const opt = {
+      "Y+": date.getFullYear().toString(), // 年
+      "m+": (date.getMonth() + 1).toString(), // 月
+      "d+": date.getDate().toString(), // 日
+      "H+": date.getHours().toString(), // 时
+      "M+": date.getMinutes().toString(), // 分
+      "S+": date.getSeconds().toString() // 秒
+      // 有其他格式化字符需求可以继续添加，必须转化成字符串
+    };
+    for (let k in opt) {
+      ret = new RegExp("(" + k + ")").exec(fmt);
+      if (ret) {
+        fmt = fmt.replace(ret[1], (ret[1].length == 1) ? (opt[k]) : (opt[k].padStart(ret[1].length, "0")))
+      };
+    };
+    return fmt;
+  }
 
 export function courtType(value){
     value = parseInt(value)
@@ -35,21 +93,24 @@ export function returnThreeDay(){
     dayValue.setTime(dayValue.getTime());
     const today = {
         str:dayValue.getFullYear()+"-" + (dayValue.getMonth()+1) + "-" + dayValue.getDate(),
-        gettime:dayValue.getTime()
+        // gettime:dayValue.getTime()
+        gettime:new Date(dayValue.getFullYear()+"-" + (dayValue.getMonth()+1) + "-" + dayValue.getDate()).getTime()
     }
     ThreeDay.push(today)
     // 明天
     dayValue.setTime(dayValue.getTime()+24*60*60*1000);
     const tomorrow = {
         str:dayValue.getFullYear()+"-" + (dayValue.getMonth()+1) + "-" + dayValue.getDate(),
-        gettime:dayValue.getTime()
+        // gettime:dayValue.getTime()
+        gettime:new Date(dayValue.getFullYear()+"-" + (dayValue.getMonth()+1) + "-" + dayValue.getDate()).getTime()
     }
     ThreeDay.push(tomorrow)
     // 后天
     dayValue.setTime(dayValue.getTime()+24*60*60*1000);
     const lastday = {
         str:dayValue.getFullYear()+"-" + (dayValue.getMonth()+1) + "-" + dayValue.getDate(),
-        gettime:dayValue.getTime()
+        // gettime:dayValue.getTime()
+        gettime:new Date(dayValue.getFullYear()+"-" + (dayValue.getMonth()+1) + "-" + dayValue.getDate()).getTime()
     }
     ThreeDay.push(lastday)
     

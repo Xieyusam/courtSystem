@@ -3,9 +3,14 @@
     <div class="page-header">资源管理</div>
     <div class="search-line">
       <div style="width: 100px; margin-right: 14px">
-        <el-select v-model="value1" size="medium" placeholder="类型">
+        <el-select
+          v-model="search.type"
+          size="medium"
+          @change="searchData(search)"
+          placeholder="类型"
+        >
           <el-option
-            v-for="item in options1"
+            v-for="item in options3"
             :key="item.value"
             :label="item.label"
             :value="item.value"
@@ -13,10 +18,15 @@
           </el-option>
         </el-select>
       </div>
-      <div style="width: 100px; margin-right: 14px;">
-        <el-select v-model="value" size="medium" placeholder="状态">
+      <div style="width: 100px; margin-right: 14px">
+        <el-select
+          v-model="search.status"
+          size="medium"
+          @change="searchData(search)"
+          placeholder="状态"
+        >
           <el-option
-            v-for="item in options"
+            v-for="item in options2"
             :key="item.value"
             :label="item.label"
             :value="item.value"
@@ -24,24 +34,25 @@
           </el-option>
         </el-select>
       </div>
-      <div style="width: 200px;">
+      <div style="width: 200px; margin-right: 14px">
         <el-input
-          placeholder="名称或备注"
+          placeholder="名称"
           prefix-icon="el-icon-search"
-          v-model="input2"
+          @change="searchData(search)"
+          v-model="search.Text"
           size="medium"
         >
         </el-input>
       </div>
       <div>
-        <el-button size="medium" icon="el-icon-search"></el-button>
-        <el-button @click="dialogVisible = true" size="medium" type="primary"
+        <el-button size="medium" @click="resetSearch">清空</el-button>
+        <el-button @click="changeInfo('new')" size="medium" type="primary"
           >创建球场</el-button
         >
       </div>
     </div>
     <el-table
-      :data="tableData"
+      :data="tableData2"
       border
       style="width: 100%"
       :header-cell-style="{ background: '#eeeeee' }"
@@ -59,28 +70,35 @@
       <el-table-column prop="status" label="状态" width="180" align="center">
         <template slot-scope="scope">
           <span
-            :style="{ color: scope.row.status == 1 ? '#67C23A' : '#F56C6C' }"
-            >{{ scope.row.status == 1 ? "正常" : "停用" }}</span
+            :style="{ color: scope.row.status == 0 ? '#67C23A' : '#F56C6C' }"
+            >{{ scope.row.status == 0 ? "正常" : "停用" }}</span
           >
         </template>
       </el-table-column>
       <el-table-column prop="tips" label="备注" align="center">
       </el-table-column>
-      <el-table-column label="操作" width="180" align="center">
+      <el-table-column label="操作" width="280" align="center">
         <template slot-scope="scope">
           <el-button
-            type="success"
-            v-if="scope.row.status == 0"
+            type="info"
             size="mini"
-            @click="handleOpen(scope.$index, scope.row)"
+            @click="changeInfo('edit', scope.$index, scope.row)"
+          >
+            编辑
+          </el-button>
+          <el-button
+            type="success"
+            v-if="scope.row.status == 1"
+            size="mini"
+            @click="changeStatus(scope.$index, scope.row, 0)"
           >
             恢复
           </el-button>
           <el-button
             type="warning"
-            v-if="scope.row.status == 1"
+            v-if="scope.row.status == 0"
             size="mini"
-            @click="handleStop(scope.$index, scope.row)"
+            @click="changeStatus(scope.$index, scope.row, 1)"
           >
             停用
           </el-button>
@@ -95,7 +113,7 @@
     </el-table>
     <!-- 创建球场 -->
     <el-dialog
-      title="创建球场"
+      :title="dialogTitle"
       :visible.sync="dialogVisible"
       width="300px"
       :before-close="handleClose"
@@ -103,17 +121,18 @@
       <div>
         <el-input
           placeholder="球场名称"
-          v-model="input2"
+          v-model="court.name"
           size="medium"
           style="width: 100%; margin-bottom: 20px"
         >
         </el-input>
 
         <el-select
-          v-model="value1"
+          v-model="court.type"
           size="medium"
           style="width: 100%; margin-bottom: 20px"
           placeholder="类型"
+          :disabled="dialogTitle != '创建球场'"
         >
           <el-option
             v-for="item in options1"
@@ -126,7 +145,7 @@
 
         <el-input
           placeholder="备注"
-          v-model="input2"
+          v-model="court.tips"
           size="medium"
           style="width: 100%; margin-bottom: 20px"
         >
@@ -134,7 +153,18 @@
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button size="mini" @click="dialogVisible = false">取 消</el-button>
-        <el-button size="mini" type="primary" @click="dialogVisible = false"
+        <el-button
+          v-if="dialogTitle == '创建球场'"
+          size="mini"
+          type="primary"
+          @click="newCourtPost(court)"
+          >确 定</el-button
+        >
+        <el-button
+          v-else
+          size="mini"
+          type="primary"
+          @click="SaveCourtPost(court)"
           >确 定</el-button
         >
       </span>
@@ -144,160 +174,87 @@
 
 <script>
 import { courtType } from "@/util/common";
+import { AllCourt, setCourt, delCourt, newCourt } from "@/api/court";
+
 export default {
   data() {
     return {
       dialogVisible: false,
-      tableData: [
-        {
-          name: "羽毛球场1",
-          type: 1,
-          status: 1,
-          tips: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          name: "羽毛球场1",
-          type: 1,
-          status: 1,
-          tips: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          name: "羽毛球场1",
-          type: 1,
-          status: 1,
-          tips: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          name: "羽毛球场1",
-          type: 1,
-          status: 1,
-          tips: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          name: "篮球场1",
-          type: 2,
-          status: 1,
-          tips: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          name: "篮球场1",
-          type: 2,
-          status: 1,
-          tips: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          name: "篮球场1",
-          type: 2,
-          status: 1,
-          tips: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          name: "篮球场1",
-          type: 2,
-          status: 1,
-          tips: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          name: "篮球场1",
-          type: 2,
-          status: 1,
-          tips: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          name: "篮球场1",
-          type: 2,
-          status: 1,
-          tips: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          name: "篮球场1",
-          type: 2,
-          status: 1,
-          tips: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          name: "篮球场1",
-          type: 2,
-          status: 1,
-          tips: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          name: "篮球场1",
-          type: 2,
-          status: 1,
-          tips: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          name: "篮球场1",
-          type: 2,
-          status: 1,
-          tips: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          name: "篮球场1",
-          type: 2,
-          status: 0,
-          tips: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          name: "篮球场1",
-          type: 2,
-          status: 0,
-          tips: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          name: "篮球场1",
-          type: 2,
-          status: 0,
-          tips: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          name: "篮球场1",
-          type: 2,
-          status: 0,
-          tips: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          name: "篮球场1",
-          type: 2,
-          status: 0,
-          tips: "上海市普陀区金沙江路 1518 弄",
-        },
-      ],
+      dialogTitle: "创建球场",
+      tableData: [],
+      tableData2: [],
+      search: {
+        type: "",
+        Text: "",
+        status,
+      },
       options1: [
         {
-          value: "1",
+          value: 1,
           label: "羽毛球",
         },
         {
-          value: "2",
+          value: 2,
           label: "篮球",
         },
         {
-          value: "3",
+          value: 3,
           label: "乒乓球",
         },
         {
-          value: "4",
+          value: 4,
           label: "桌球",
         },
         {
-          value: "5",
+          value: 5,
           label: "网球",
         },
       ],
-      value1: "",
+      options3: [
+        {
+          value: "",
+          label: "全部",
+        },
+        {
+          value: 1,
+          label: "羽毛球",
+        },
+        {
+          value: 2,
+          label: "篮球",
+        },
+        {
+          value: 3,
+          label: "乒乓球",
+        },
+        {
+          value: 4,
+          label: "桌球",
+        },
+        {
+          value: 5,
+          label: "网球",
+        },
+      ],
+      court: {
+        name: "",
+        type: "",
+        tips: "",
+      },
       options2: [
         {
-          value: "1",
+          value: "",
+          label: "全部",
+        },
+        {
+          value: "0",
           label: "正常",
         },
         {
-          value: "2",
+          value: "1",
           label: "停用",
         },
       ],
-      value2: "1",
     };
   },
   filters: {
@@ -305,18 +262,158 @@ export default {
       return courtType(value);
     },
   },
+  mounted() {
+    this.getAllCourt();
+  },
   methods: {
+    searchData(search) {
+      this.tableData2 = this.tableData.filter((item) => {
+        return (
+          item.type.toString().indexOf(search.type.toString()) != -1 &&
+          item.status.toString().indexOf(search.status.toString()) != -1 &&
+          item.name.toString().indexOf(search.Text.toString()) != -1
+        );
+      });
+    },
+    getAllCourt() {
+      AllCourt().then((res) => {
+        if (res.code == 200) {
+          this.tableData = res.data.Courts;
+          this.searchData(this.search);
+        }
+      });
+    },
+    changeStatus(index, row, status) {
+      const parems = {
+        id: row.id,
+        status: status,
+      };
+      setCourt(parems)
+        .then((res) => {
+          if (res.code == 200) {
+            this.$message({
+              message: "修改成功",
+              type: "success",
+            });
+            this.getAllCourt();
+          }
+        })
+        .catch((err) => {
+          this.$message({
+            message: "失败",
+            type: "warning",
+          });
+        });
+    },
+    changeInfo(type, index, row) {
+      if (type == "edit") {
+        this.dialogVisible = true;
+        this.dialogTitle = "编辑球场";
+        this.court = {
+          name: row.name,
+          type: row.type,
+          tips: row.tips,
+          id: row.id,
+        };
+      }
+      if (type == "new") {
+        this.dialogVisible = true;
+        this.dialogTitle = "创建球场";
+        this.court = {
+          name: "",
+          type: "",
+          tips: "",
+        };
+      }
+    },
     // 删除
     handleDelete(index, row) {
-      alert("删除" + index);
+      const parems = {
+        id: row.id,
+      };
+      delCourt(parems)
+        .then((res) => {
+          if (res.code == 200) {
+            this.$message({
+              message: "删除成功",
+              type: "success",
+            });
+            this.getAllCourt();
+          }
+        })
+        .catch((err) => {
+          this.$message({
+            message: "失败",
+            type: "warning",
+          });
+        });
     },
-    // 恢复
-    handleOpen(index, row) {
-      alert("恢复" + index);
+    //新建球场
+    SaveCourtPost(court) {
+      this.dialogVisible = false;
+      const parems = { ...court };
+      setCourt(parems)
+        .then((res) => {
+          if (res.code == 200) {
+            this.$message({
+              message: "保存成功",
+              type: "success",
+            });
+            this.court = {
+              name: "",
+              type: "",
+              tips: "",
+            };
+            this.getAllCourt();
+          }
+        })
+        .catch((err) => {
+          this.$message({
+            message: "失败",
+            type: "warning",
+          });
+        });
     },
-    // 停用
-    handleStop(index, row) {
-      alert("停用" + index);
+    //新建球场
+    newCourtPost(court) {
+      this.dialogVisible = false;
+      const parems = { ...court };
+      newCourt(parems)
+        .then((res) => {
+          if (res.code == 200) {
+            this.$message({
+              message: "新建成功",
+              type: "success",
+            });
+            this.court = {
+              name: "",
+              type: "",
+              tips: "",
+            };
+            this.getAllCourt();
+          }
+        })
+        .catch((err) => {
+          this.$message({
+            message: "失败",
+            type: "warning",
+          });
+        });
+    },
+    handleClose() {
+      this.court = {
+        name: "",
+        type: "",
+        tips: "",
+      };
+    },
+    resetSearch() {
+      this.search = {
+        type: "",
+        Text: "",
+        status,
+      };
+      this.searchData(this.search);
     },
   },
 };

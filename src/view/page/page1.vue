@@ -38,7 +38,8 @@ export default {
   methods: {
     goToPage(index) {
       this.$router.push({ path: "/page" + index });
-    },
+    }
+
   },
 };
 </script>

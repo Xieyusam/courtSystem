@@ -3,7 +3,7 @@
     <div class="page-header">用户管理</div>
     <div class="search-line">
       <div style="width: 100px; margin-right: 14px">
-        <el-select v-model="value1" size="medium" placeholder="角色">
+        <el-select v-model="search.role" size="medium" placeholder="角色">
           <el-option
             v-for="item in options1"
             :key="item.value"
@@ -14,7 +14,7 @@
         </el-select>
       </div>
       <div style="width: 100px; margin-right: 14px">
-        <el-select v-model="value2" size="medium" placeholder="状态">
+        <el-select v-model="search.status" size="medium" placeholder="状态">
           <el-option
             v-for="item in options2"
             :key="item.value"
@@ -24,24 +24,28 @@
           </el-option>
         </el-select>
       </div>
-      <div style="width: 200px">
+      <div style="width: 200px; margin-right: 14px">
         <el-input
-          placeholder="姓名或手机号码"
+          placeholder="姓名"
           prefix-icon="el-icon-search"
-          v-model="input2"
+          v-model="search.name"
           size="medium"
         >
         </el-input>
       </div>
       <div>
-        <el-button size="medium" icon="el-icon-search"></el-button>
-        <el-button @click="dialogVisible = true" size="medium" type="primary"
+        <el-button size="medium" @click="reset">清空</el-button>
+        <!-- <el-button @click="dialogVisible = true" size="medium" type="primary"
           >创建管理员</el-button
-        >
+        > -->
       </div>
     </div>
     <el-table
-      :data="tableData"
+      :data="tableData.filter(item =>{
+        return item.role.toString().indexOf(search.role.toString()) != -1 &&
+          item.status.toString().indexOf(search.status.toString()) != -1 &&
+          item.name.toString().indexOf(search.name.toString()) != -1
+      })"
       border
       style="width: 100%"
       :header-cell-style="{ background: '#eeeeee' }"
@@ -60,93 +64,86 @@
               class="iconfont"
               :class="scope.row.role == 0 ? 'iconyonghu' : 'iconguanliyuan2'"
             ></i
-            >{{ scope.row.role == 0 ? "普通用户" : "管理员" }}</span
+            >{{
+              scope.row.role == 0
+                ? "普通用户"
+                : scope.row.role == 1
+                ? "管理员"
+                : "超级管理员"
+            }}</span
           >
         </template>
       </el-table-column>
       <el-table-column prop="status" label="状态" align="center">
         <template slot-scope="scope">
           <span
-            :style="{ color: scope.row.status == 1 ? '#67C23A' : '#F56C6C' }"
-            >{{ scope.row.status == 1 ? "正常" : "停用" }}</span
+            :style="{ color: scope.row.status == 0 ? '#67C23A' : '#F56C6C' }"
+            >{{ scope.row.status == 0 ? "正常" : "停用" }}</span
           >
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="280" align="center">
+      <el-table-column label="操作" width="320" align="center">
         <template slot-scope="scope">
-          <el-button
-            type="success"
-            v-if="scope.row.status == 0"
-            size="mini"
-            @click="handleOpen(scope.$index, scope.row)"
-          >
-            恢复
-          </el-button>
-          <el-button
-            type="warning"
-            v-if="scope.row.status == 1"
-            size="mini"
-            @click="handleStop(scope.$index, scope.row)"
-          >
-            停用
-          </el-button>
-          <el-button size="mini" @click="handleReset(scope.$index, scope.row)">
-            重置密码
-          </el-button>
-          <el-button
-            size="mini"
-            type="danger"
-            @click="handleDelete(scope.$index, scope.row)"
-            >删除</el-button
-          >
+          <div v-if="mine.role > scope.row.role">
+            <el-button
+              type="success"
+              v-if="mine.role == 2 && scope.row.role == 0"
+              size="mini"
+              @click="userInfoChange('role', 1, scope.row)"
+            >
+              设为管理员
+            </el-button>
+            <el-button
+              type="warning"
+              v-if="mine.role == 2 && scope.row.role == 1"
+              size="mini"
+              @click="userInfoChange('role', 0, scope.row)"
+            >
+              取消管理员
+            </el-button>
+            <el-button
+              type="success"
+              v-if="scope.row.status == 1"
+              size="mini"
+              @click="userInfoChange('status', 0, scope.row)"
+            >
+              恢复
+            </el-button>
+            <el-button
+              type="warning"
+              v-if="scope.row.status == 0"
+              size="mini"
+              @click="userInfoChange('status', 1, scope.row)"
+            >
+              停用
+            </el-button>
+            <el-button
+              size="mini"
+              @click="handleReset(scope.$index, scope.row)"
+            >
+              重置密码
+            </el-button>
+            <!-- <el-button
+              size="mini"
+              type="danger"
+              @click="handleDelete(scope.$index, scope.row)"
+              >删除</el-button
+            > -->
+          </div>
+          <div v-else>您无法对该账号操作</div>
         </template>
       </el-table-column>
     </el-table>
-    <!-- 创建管理员 -->
-    <el-dialog
-      title="创建管理员"
-      :visible.sync="dialogVisible"
-      width="300px"
-      :before-close="handleClose"
-    >
-      <div>
-        <el-input
-          placeholder="姓名"
-          v-model="newUser.name"
-          size="medium"
-          style="width: 100%; margin-bottom: 20px"
-        >
-        </el-input>
-        <el-input
-          placeholder="手机号"
-          v-model="newUser.phone"
-          size="medium"
-          style="width: 100%; margin-bottom: 20px"
-        >
-        </el-input>
-        <el-input
-          placeholder="初始密码默认：123456"
-          v-model="notext"
-          disabled
-          size="medium"
-          style="width: 100%; margin-bottom: 20px"
-        >
-        </el-input>
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="dialogVisible = false">取 消</el-button>
-        <el-button size="mini" type="primary" @click="dialogVisible = false"
-          >确 定</el-button
-        >
-      </span>
-    </el-dialog>
   </div>
 </template>
 
 <script>
+import { AllUser, userChange , resetPassword } from "@/api/user";
+import { localData } from "@/util/local";
 export default {
   data() {
     return {
+      mine: {},
       newUser: {
         name: "",
         phone: "",
@@ -154,131 +151,15 @@ export default {
       },
       notext: "初始密码默认：123456",
       dialogVisible: false,
-      tableData: [
-        {
-          name: "用户1",
-          phone: "13143101301",
-          status: 0,
-          role: 0,
-        },
-        {
-          name: "用户1",
-          phone: "13143101301",
-          status: 1,
-          role: 0,
-        },
-        {
-          name: "用户1",
-          phone: "13143101301",
-          status: 0,
-          role: 0,
-        },
-        {
-          name: "用户1",
-          phone: "13143101301",
-          status: 1,
-          role: 0,
-        },
-        {
-          name: "用户1",
-          phone: "13143101301",
-          status: 1,
-          role: 2,
-        },
-        {
-          name: "用户1",
-          phone: "13143101301",
-          status: 1,
-          role: 2,
-        },
-        {
-          name: "用户1",
-          phone: "13143101301",
-          status: 1,
-          role: 0,
-        },
-        {
-          name: "用户1",
-          phone: "13143101301",
-          status: 1,
-          role: 0,
-        },
-        {
-          name: "用户1",
-          phone: "13143101301",
-          status: 1,
-          role: 0,
-        },
-        {
-          name: "用户1",
-          phone: "13143101301",
-          status: 1,
-          role: 0,
-        },
-        {
-          name: "用户1",
-          phone: "13143101301",
-          status: 1,
-          role: 0,
-        },
-        {
-          name: "用户1",
-          phone: "13143101301",
-          status: 1,
-          role: 0,
-        },
-        {
-          name: "用户1",
-          phone: "13143101301",
-          status: 1,
-          role: 0,
-        },
-        {
-          name: "用户1",
-          phone: "13143101301",
-          status: 1,
-          role: 0,
-        },
-        {
-          name: "用户1",
-          phone: "13143101301",
-          status: 1,
-          role: 0,
-        },
-        {
-          name: "用户1",
-          phone: "13143101301",
-          status: 1,
-          role: 0,
-        },
-        {
-          name: "用户1",
-          phone: "13143101301",
-          status: 1,
-          role: 0,
-        },
-        {
-          name: "用户1",
-          phone: "13143101301",
-          status: 1,
-          role: 0,
-        },
-        {
-          name: "用户1",
-          phone: "13143101301",
-          status: 1,
-          role: 0,
-        },
-        {
-          name: "用户1",
-          phone: "13143101301",
-          status: 1,
-          role: 0,
-        },
-      ],
+      search:{
+        status:"",
+        role:"",
+        name:""
+      },
+      tableData: [],
       options1: [
         {
-          value: "2",
+          value: "",
           label: "全部",
         },
         {
@@ -288,27 +169,69 @@ export default {
         {
           value: "1",
           label: "管理员",
-        },
+        },{
+          value: "2",
+          label: "超级管理员",
+        }
       ],
-      value1: "2",
       options2: [
         {
-          value: "0",
+          value: "",
           label: "全部",
         },
         {
-          value: "1",
+          value: "0",
           label: "正常",
         },
         {
-          value: "2",
+          value: "1",
           label: "停用",
         },
       ],
-      value2: "0",
     };
   },
+  mounted() {
+    this.mine = localData("get", "userinfo");
+    this.getAllUser();
+  },
   methods: {
+    getAllUser() {
+      AllUser().then((res) => {
+        if (res.code == 200) {
+          this.tableData = res.data.users.filter((item) => {
+            return item.id != this.mine.id;
+          });
+        }
+      });
+    },
+    userInfoChange(type, value, row) {
+      let parems = {
+        id: row.id,
+      };
+      if (type == "role") {
+        parems.role = value;
+      }
+      if (type == "status") {
+        parems.status = value;
+      }
+      userChange(parems)
+        .then((res) => {
+          if (res.code == 200) {
+            this.$message({
+              message: "修改成功",
+              type: "success",
+            });
+            this.getAllUser();
+          }
+        })
+        .catch((err) => {
+          this.$message({
+            message: "失败",
+            type: "warning",
+          });
+        });
+    },
+
     // 删除
     handleDelete(index, row) {
       alert("删除" + index);
@@ -323,8 +246,31 @@ export default {
     },
     // 重置密码
     handleReset(index, row) {
-      alert("重置密码" + index);
+      const parems = {
+        id:row.id
+      }
+      resetPassword(parems).then(res =>{
+        if(res.code == 200) {
+          this.$message({
+              message: "账号"+ row.name+ "密码已重置为123456",
+              type: "success",
+            });
+        }
+      })
+      .catch(err =>{
+        this.$message({
+            message: "失败",
+            type: "warning",
+          });
+      })
     },
+    reset(){
+      this.search = {
+        status:"",
+        role:"",
+        name:""
+      }
+    }
   },
 };
 </script>
